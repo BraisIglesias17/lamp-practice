@@ -1,0 +1,35 @@
+version: '2'
+networks:
+  lamp_network:
+services:
+  apache:
+    build:
+      context: ./apache
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - "/root/source/:/var/www/html"
+    environment:
+      DB_PORT: "3306"
+      DB_HOST: "db"
+    links:
+      - "mariadb:db"
+    ports:
+      - "8080:80"
+    depends_on:
+      - mariadb
+    networks:
+      - lamp_network
+  mariadb:
+    build:
+      context: ./mariadb
+      dockerfile: Dockerfile
+    environment:
+        DBUSER: user
+        DBPASS: pass
+        DBNAME: proyecto
+    stdin_open: true
+    tty: true
+    restart: on-failure
+    networks:
+      - lamp_network    
